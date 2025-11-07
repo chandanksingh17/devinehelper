@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Send } from 'lucide-react';
+import { Send, Sparkles } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 
 interface AboutPageProps {
   language: 'en' | 'hi';
@@ -55,18 +57,16 @@ export default function AboutPage({ language }: AboutPageProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const t = translations[language];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !email || !message) return;
-
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+  // Contact form mutation
+  const contactMutation = useMutation({
+    mutationFn: async (data: { name: string; email: string; message: string }) => {
+      const res = await apiRequest('POST', '/api/contact', data);
+      return res.json();
+    },
+    onSuccess: () => {
       toast({
         title: t.successTitle,
         description: t.successDesc
@@ -74,9 +74,24 @@ export default function AboutPage({ language }: AboutPageProps) {
       setName('');
       setEmail('');
       setMessage('');
-      setLoading(false);
-    }, 1000);
+    },
+    onError: () => {
+      toast({
+        title: 'Error',
+        description: 'Failed to send message. Please try again.',
+        variant: 'destructive'
+      });
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email || !message) return;
+
+    contactMutation.mutate({ name, email, message });
   };
+
+  const loading = contactMutation.isPending;
 
   return (
     <div className="min-h-screen py-8 px-4 animate-fade-in">
@@ -94,7 +109,7 @@ export default function AboutPage({ language }: AboutPageProps) {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl font-serif text-primary flex items-center gap-2">
-              <span className="text-3xl">🕉️</span>
+              <Sparkles className="w-6 h-6" />
               {t.mission}
             </CardTitle>
           </CardHeader>
@@ -109,7 +124,7 @@ export default function AboutPage({ language }: AboutPageProps) {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-2xl font-serif text-primary flex items-center gap-2">
-              <span className="text-3xl">✨</span>
+              <Sparkles className="w-6 h-6" />
               {t.vision}
             </CardTitle>
           </CardHeader>

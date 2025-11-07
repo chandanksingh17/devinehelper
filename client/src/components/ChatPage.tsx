@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Sparkles } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 
 interface ChatPageProps {
   language: 'en' | 'hi';
@@ -35,23 +37,9 @@ const translations = {
   }
 };
 
-// Mock AI response - in real app, this would call Gemini API
-const getMockResponse = (question: string): Message => {
-  return {
-    role: 'assistant',
-    content: 'The essence of dharma lies in performing one\'s duty without attachment to results. This principle teaches us to focus on our actions while surrendering the outcomes to the divine. By doing so, we free ourselves from anxiety and align with the cosmic order.',
-    shloka: {
-      sanskrit: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन। मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥',
-      meaning: 'You have the right to perform your prescribed duties, but you are not entitled to the fruits of your actions. Never consider yourself to be the cause of the results of your activities, nor be attached to inaction.',
-      reference: 'Bhagavad Gita, Chapter 2, Verse 47'
-    }
-  };
-};
-
 export default function ChatPage({ language }: ChatPageProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const t = translations[language];
 
@@ -63,21 +51,41 @@ export default function ChatPage({ language }: ChatPageProps) {
     scrollToBottom();
   }, [messages]);
 
+  // Chat mutation
+  const chatMutation = useMutation({
+    mutationFn: async (message: string) => {
+      const res = await apiRequest('POST', '/api/chat', { message });
+      return res.json() as Promise<{content: string; shloka: {sanskrit: string; meaning: string; reference: string}}>;
+    },
+    onSuccess: (data) => {
+      const aiMessage: Message = {
+        role: 'assistant',
+        content: data.content,
+        shloka: data.shloka,
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    },
+    onError: () => {
+      const errorMessage: Message = {
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error. Please try again.',
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    },
+  });
+
   const handleSend = () => {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || chatMutation.isPending) return;
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
-    setLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      const aiResponse = getMockResponse(input);
-      setMessages(prev => [...prev, aiResponse]);
-      setLoading(false);
-    }, 1500);
+    
+    chatMutation.mutate(currentInput);
   };
+
+  const loading = chatMutation.isPending;
 
   return (
     <div className="h-screen flex flex-col animate-fade-in">
@@ -98,7 +106,7 @@ export default function ChatPage({ language }: ChatPageProps) {
         <div className="container mx-auto max-w-4xl space-y-4">
           {messages.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-6xl mb-4">🕉️</div>
+              <Sparkles className="w-16 h-16 mx-auto mb-4 text-primary" />
               <p className="text-muted-foreground italic max-w-md mx-auto">
                 {t.emptyState}
               </p>

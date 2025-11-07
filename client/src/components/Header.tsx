@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Trophy, Menu, X } from 'lucide-react';
+import { Globe, Trophy, Menu, X, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   currentPage: string;
@@ -52,7 +52,7 @@ export default function Header({ currentPage, onNavigate, language, onLanguageTo
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="text-2xl font-serif font-bold text-primary flex items-center gap-2">
-              <span className="text-3xl">🪷</span>
+              <Sparkles className="w-7 h-7 text-primary" />
               <span data-testid="text-app-name">DHRM</span>
             </div>
           </div>

@@ -1,20 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Plus, Flame, Trophy } from 'lucide-react';
+import { queryClient, apiRequest } from '@/lib/queryClient';
+import type { Task, UserSettings } from '@shared/schema';
 
 interface KarmPageProps {
   language: 'en' | 'hi';
   onStreakChange: (streak: number) => void;
-}
-
-interface Task {
-  id: string;
-  text: string;
-  completed: boolean;
 }
 
 const translations = {
@@ -40,39 +37,106 @@ const translations = {
   }
 };
 
-// Mock initial tasks
-const initialTasks: Task[] = [
-  { id: '1', text: 'Morning meditation - 10 minutes', completed: false },
-  { id: '2', text: 'Read one chapter from Bhagavad Gita', completed: false },
-  { id: '3', text: 'Practice gratitude journaling', completed: false }
-];
-
 export default function KarmPage({ language, onStreakChange }: KarmPageProps) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [newTaskText, setNewTaskText] = useState('');
-  const [streak, setStreak] = useState(7);
   const t = translations[language];
+
+  // Fetch tasks
+  const { data: tasks = [], isLoading: tasksLoading } = useQuery<Task[]>({
+    queryKey: ['/api/tasks'],
+  });
+
+  // Fetch user settings (streak)
+  const { data: settings } = useQuery<UserSettings>({
+    queryKey: ['/api/settings'],
+  });
+
+  const streak = settings?.streak || 0;
+
+  // Update streak count in parent component
+  useEffect(() => {
+    onStreakChange(streak);
+  }, [streak, onStreakChange]);
 
   const completedCount = tasks.filter(task => task.completed).length;
   const progressPercentage = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
 
-  const toggleTask = (id: string) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  // Mutation to update streak
+  const updateStreakMutation = useMutation({
+    mutationFn: async () => {
+      if (!settings) return { streak: 0 };
+      
+      // Calculate new streak based on backend data
+      const today = new Date();
+      const lastDate = settings.lastCompletedDate ? new Date(settings.lastCompletedDate) : null;
+      
+      let newStreak = 1;
+      if (lastDate) {
+        const daysDiff = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysDiff === 1) {
+          // Consecutive day
+          newStreak = settings.streak + 1;
+        } else if (daysDiff === 0) {
+          // Same day, don't update
+          return settings;
+        }
+        // If more than 1 day, reset to 1
+      }
+      
+      const res = await apiRequest('PATCH', '/api/settings', { 
+        streak: newStreak,
+        lastCompletedDate: today.toISOString()
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/settings'] });
+    },
+  });
+
+  // When all tasks are completed, update streak
+  useEffect(() => {
+    if (tasks.length > 0 && completedCount === tasks.length && completedCount > 0 && settings) {
+      const today = new Date().toDateString();
+      const lastDate = settings.lastCompletedDate ? new Date(settings.lastCompletedDate).toDateString() : null;
+      
+      // Only update if we haven't completed today yet
+      if (lastDate !== today && !updateStreakMutation.isPending) {
+        updateStreakMutation.mutate();
+      }
+    }
+  }, [completedCount, tasks.length, settings]);
+
+  // Create task mutation
+  const createTaskMutation = useMutation({
+    mutationFn: async (text: string) => {
+      const res = await apiRequest('POST', '/api/tasks', { text, completed: false });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      setNewTaskText('');
+    },
+  });
+
+  // Update task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ id, completed }: { id: string; completed: boolean }) => {
+      const res = await apiRequest('PATCH', `/api/tasks/${id}`, { completed });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+    },
+  });
+
+  const toggleTask = (id: string, currentCompleted: boolean) => {
+    updateTaskMutation.mutate({ id, completed: !currentCompleted });
   };
 
   const addTask = () => {
     if (!newTaskText.trim()) return;
-    
-    const newTask: Task = {
-      id: Date.now().toString(),
-      text: newTaskText,
-      completed: false
-    };
-    
-    setTasks([...tasks, newTask]);
-    setNewTaskText('');
+    createTaskMutation.mutate(newTaskText);
   };
 
   return (
@@ -129,7 +193,11 @@ export default function KarmPage({ language, onStreakChange }: KarmPageProps) {
             <CardTitle className="text-xl">{t.todayTasks}</CardTitle>
           </CardHeader>
           <CardContent>
-            {tasks.length === 0 ? (
+            {tasksLoading ? (
+              <p className="text-center text-muted-foreground italic py-8">
+                Loading tasks...
+              </p>
+            ) : tasks.length === 0 ? (
               <p className="text-center text-muted-foreground italic py-8">
                 {t.noTasks}
               </p>
@@ -143,7 +211,7 @@ export default function KarmPage({ language, onStreakChange }: KarmPageProps) {
                   >
                     <Checkbox
                       checked={task.completed}
-                      onCheckedChange={() => toggleTask(task.id)}
+                      onCheckedChange={() => toggleTask(task.id, task.completed)}
                       data-testid={`checkbox-task-${task.id}`}
                       className="mt-0.5"
                     />
@@ -178,6 +246,7 @@ export default function KarmPage({ language, onStreakChange }: KarmPageProps) {
               />
               <Button
                 onClick={addTask}
+                disabled={createTaskMutation.isPending}
                 data-testid="button-add-task"
                 className="gap-2 hover-elevate active-elevate-2"
               >
