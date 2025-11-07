@@ -238,11 +238,16 @@ export default function DhyanPage({ language }: DhyanPageProps) {
           </Button>
         </div>
 
-        {/* Hidden audio element - would play meditation music */}
+        {/* Meditation music audio - todo: Add calm, soothing meditation music file */}
+        {/* Recommended: Tibetan singing bowls, nature sounds (rain, ocean waves), 
+            soft flute music, or traditional Hindu meditation music */}
         <audio
           ref={audioRef}
           loop
-          src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+          // Replace with your meditation music file path
+          // Example: src="/meditation-music.mp3"
+          // For now, using a calm nature sound placeholder
+          src="https://assets.mixkit.co/music/preview/mixkit-meditation-song-2197.mp3"
         />
       </div>
     </div>
