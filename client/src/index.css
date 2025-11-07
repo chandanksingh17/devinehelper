@@ -14,55 +14,55 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 0 0% 98%;
+  --background: 37 100% 97%;
 
   --foreground: 0 0% 15%;
 
-  --border: 0 0% 88%;
+  --border: 37 50% 88%;
 
-  --card: 45 44% 96%;
+  --card: 37 100% 98%;
 
   --card-foreground: 0 0% 15%;
 
-  --card-border: 45 44% 91%;
+  --card-border: 37 60% 92%;
 
-  --sidebar: 45 44% 94%;
+  --sidebar: 37 100% 96%;
 
   --sidebar-foreground: 0 0% 18%;
 
-  --sidebar-border: 45 44% 89%;
+  --sidebar-border: 37 50% 90%;
 
   --sidebar-primary: 24 100% 60%;
 
-  --sidebar-primary-foreground: 45 44% 98%;
+  --sidebar-primary-foreground: 37 100% 98%;
 
-  --sidebar-accent: 45 32% 88%;
+  --sidebar-accent: 37 40% 90%;
 
   --sidebar-accent-foreground: 0 0% 20%;
 
   --sidebar-ring: 24 100% 60%;
 
-  --popover: 45 44% 93%;
+  --popover: 37 100% 96%;
 
   --popover-foreground: 0 0% 18%;
 
-  --popover-border: 45 44% 88%;
+  --popover-border: 37 50% 90%;
 
   --primary: 24 100% 60%;
 
-  --primary-foreground: 45 44% 98%;
+  --primary-foreground: 37 100% 98%;
 
-  --secondary: 45 32% 86%;
+  --secondary: 43 85% 56%;
 
-  --secondary-foreground: 0 0% 20%;
+  --secondary-foreground: 0 0% 15%;
 
-  --muted: 45 20% 90%;
+  --muted: 37 30% 92%;
 
-  --muted-foreground: 0 0% 35%;
+  --muted-foreground: 0 0% 40%;
 
-  --accent: 45 18% 88%;
+  --accent: 207 90% 54%;
 
-  --accent-foreground: 0 0% 22%;
+  --accent-foreground: 0 0% 98%;
 
   --destructive: 351 100% 35%;
 
@@ -71,13 +71,13 @@
   --input: 0 0% 75%;
   --ring: 24 100% 60%;
   --chart-1: 24 100% 60%;
-  --chart-2: 43 74% 49%;
-  --chart-3: 351 83% 38%;
+  --chart-2: 43 85% 56%;
+  --chart-3: 351 83% 25%;
   --chart-4: 207 90% 54%;
   --chart-5: 280 65% 48%;
 
-  --font-sans: Inter, Open Sans, sans-serif;
-  --font-serif: Playfair Display, Georgia, serif;
+  --font-sans: Inter, sans-serif;
+  --font-serif: Playfair Display, serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem;
   --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.05);
@@ -132,65 +132,65 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 0 0% 8%;
+  --background: 351 25% 8%;
 
-  --foreground: 0 0% 92%;
+  --foreground: 37 80% 95%;
 
-  --border: 0 0% 18%;
+  --border: 351 15% 18%;
 
-  --card: 0 3% 11%;
+  --card: 351 20% 12%;
 
-  --card-foreground: 0 0% 92%;
+  --card-foreground: 37 80% 95%;
 
-  --card-border: 0 3% 16%;
+  --card-border: 351 15% 18%;
 
-  --sidebar: 0 3% 13%;
+  --sidebar: 351 22% 10%;
 
-  --sidebar-foreground: 0 0% 90%;
+  --sidebar-foreground: 37 70% 92%;
 
-  --sidebar-border: 0 3% 18%;
+  --sidebar-border: 351 15% 16%;
 
   --sidebar-primary: 24 100% 60%;
 
-  --sidebar-primary-foreground: 0 3% 98%;
+  --sidebar-primary-foreground: 351 20% 98%;
 
-  --sidebar-accent: 0 8% 20%;
+  --sidebar-accent: 351 18% 18%;
 
-  --sidebar-accent-foreground: 0 0% 88%;
+  --sidebar-accent-foreground: 37 60% 88%;
 
   --sidebar-ring: 24 100% 60%;
 
-  --popover: 0 3% 15%;
+  --popover: 351 20% 12%;
 
-  --popover-foreground: 0 0% 90%;
+  --popover-foreground: 37 70% 92%;
 
-  --popover-border: 0 3% 20%;
+  --popover-border: 351 15% 18%;
 
   --primary: 24 100% 60%;
 
-  --primary-foreground: 0 3% 98%;
+  --primary-foreground: 351 20% 98%;
 
-  --secondary: 0 8% 22%;
+  --secondary: 43 85% 56%;
 
-  --secondary-foreground: 0 0% 88%;
+  --secondary-foreground: 0 0% 12%;
 
-  --muted: 0 6% 18%;
+  --muted: 351 12% 20%;
 
-  --muted-foreground: 0 0% 70%;
+  --muted-foreground: 37 40% 70%;
 
-  --accent: 0 6% 20%;
+  --accent: 207 90% 54%;
 
-  --accent-foreground: 0 0% 86%;
+  --accent-foreground: 0 0% 98%;
 
-  --destructive: 351 100% 35%;
+  --destructive: 351 100% 45%;
 
   --destructive-foreground: 351 44% 98%;
 
-  --input: 0 0% 32%;
+  --input: 351 10% 32%;
   --ring: 24 100% 60%;
   --chart-1: 24 100% 70%;
-  --chart-2: 43 74% 62%;
-  --chart-3: 351 83% 58%;
+  --chart-2: 43 85% 65%;
+  --chart-3: 351 83% 35%;
   --chart-4: 207 90% 68%;
   --chart-5: 280 65% 68%;
 
@@ -347,5 +347,33 @@
   .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
+  }
+
+  /* Custom animations for DHRM app */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .animate-flicker {
+    animation: flicker 1.5s ease-in-out infinite;
   }
 }
